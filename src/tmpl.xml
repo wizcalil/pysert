@@ -1,6 +1,10 @@
-<pysert iterations="10">
-	<dataset name="rand1" type="RandomNumber" floating="False" min="0" max="100"/>
-	<dataset name="rand2" type="RandomText" length="20" lowercase="True" uppercase="True"/>
-	<dataset name="seq1" type="Sequence" start="0" increment="1"/>
-	<template>#{rand1}#{rand1} lala2 ##{seq1} #{seq1} #{rand2}</template>
+<pysert iterations="20">
+	<dataset name="id" type="Sequence" start="300" increment="1"/>
+	<dataset name="fname" type="Name" firstname="True" lastname="False"/>
+	<dataset name="lname" type="Name" firstname="False" lastname="True"/>
+	<dataset name="jobid" type="Number" floating="False" min="100" max="200"/>
+	<dataset name="salary" type="Number" floating="False" min="1000" max="15000"/>
+	<template>INSERT INTO EMPLOYEES(EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, JOB_ID, SALARY)
+VALUES (#{id}, '#{fname}', '#{lname}', '#{fname}_#{lname}@domain.com', #{jobid}, #{salary})
+	</template>
  </pysert>
