@@ -1,0 +1,6 @@
+<pysert iterations="10">
+	<dataset name="rand1" type="RandomNumber" floating="False" min="0" max="100"/>
+	<dataset name="rand2" type="RandomText" length="20" lowercase="True" uppercase="True"/>
+	<dataset name="seq1" type="Sequence" start="0" increment="1"/>
+	<template>#{rand1}#{rand1} lala2 ##{seq1} #{seq1} #{rand2}</template>
+ </pysert>
