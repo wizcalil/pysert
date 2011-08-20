@@ -82,7 +82,7 @@ class Text(AbstractDataSet):
         We will need to @override the constructor in order to add 
         the _letters property .
         '''
-        super().__init__(ds_dict)
+        super(Text, self).__init__(ds_dict)
         self.letters = ' '
         if self.uppercase == 'True':
             self.letters = self.letters + string.ascii_uppercase
@@ -162,7 +162,7 @@ class Sequence(AbstractDataSet):
         We will need to @override the constructor in order to add 
         the _cval property (current value in sequence) .
         '''
-        super().__init__(ds_dict)
+        super(Sequence, self).__init__(ds_dict)
         self.__cval = int(self.start) - int(self.increment)
         
     def next_value(self):
@@ -246,7 +246,8 @@ class DataSetEvaluator(object):
     
     def update_iterations_values(self):
         '''
-        Keep a dictionary with instances values
+        Keep a dictionary with instances values to preserve next_value()
+        across iteration . 
         '''
         return {key : instance.next_value() for (key, instance) in \
                 self.instances.items()}
