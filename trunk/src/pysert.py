@@ -26,6 +26,7 @@ import random
 import re
 import string
 import sys
+import textwrap
 
 from xml.etree.ElementTree import ElementTree
 
@@ -68,37 +69,42 @@ class Number(AbstractDataSet):
         func = random.uniform if self.floating == 'True' else random.randint
         return func(int(self.min), int(self.max))
 #------------------------------------------------------------------------------
-class Text(AbstractDataSet):
+class LoremIpsum(AbstractDataSet):
+    
+    lorem_impsum = textwrap.dedent('''
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut quis justo leo. 
+    Quisque congue elit eu ante euismod ut aliquam nisi bibendum. Donec mollis 
+    ipsum nec sapien auctor ut blandit ante aliquet. Fusce eget ante nunc. 
+    Praesent ullamcorper neque sit amet diam scelerisque condimentum. Nulla 
+    faucibus, justo non pretium consequat, tortor ligula consequat elit, vitae 
+    dapibus orci metus eget nisl. Fusce ante ante, placerat et gravida ac, 
+    fermentum eu nisl. Aenean posuere, orci vel dapibus adipiscing, ipsum dui 
+    imperdiet dolor, eu rutrum lorem dolor id felis. Curabitur accumsan enim et 
+    ipsum volutpat feugiat. Vivamus eget diam eros, in volutpat justo. 
+    Curabitur bibendum, velit ac fermentum tincidunt, dui nulla volutpat nulla, 
+    in ornare dui turpis ultrices dolor. Sed gravida suscipit arcu, ut 
+    scelerisque augue aliquet non. Sed sagittis, turpis id ullamcorper rhoncus, 
+    lorem nisi fringilla leo, et tristique odio augue id tortor. Integer 
+    vehicula imperdiet nisl, eu ultrices neque condimentum eu. Ut sed purus 
+    diam, eu euismod diam. Fusce eget venenatis arcu. Mauris porta, enim vel 
+    pretium sagittis, ligula elit rutrum magna, sed pulvinar orci elit sit amet
+    leo. Pellentesque habitant morbi tristique senectus et netus et malesuada 
+    fames ac turpis egestas.
+    ''').strip().replace('\n','')
+    
     '''
     ds_dict will contain the following :
     {
         "length" : "<integer value>"
-        "uppercase" : "<boolean value>"
-        "lowercase" : "<boolean value>"
     }
-    '''
-    def __init__(self, ds_dict):
-        ''' 
-        We will need to @override the constructor in order to add 
-        the _letters property .
-        '''
-        super(Text, self).__init__(ds_dict)
-        self.letters = ' '
-        if self.uppercase == 'True':
-            self.letters = self.letters + string.ascii_uppercase
-        if self.lowercase == 'True':
-            self.letters = self.letters + string.ascii_lowercase
-        
+    ''' 
     def next_value(self):
         '''
-        Returns a random string based on ds_dict properties 
+        Returns a lorem ipsum text .
         '''
-        ret = ''
-        iter = int(self.length)
-        for i in range(iter):
-            rd = random.randint(0, 1000) % len(self.letters)
-            ret = ret + self.letters[rd] 
-        return ret
+        div = int(int(self.length) / len(LoremIpsum.lorem_impsum))
+        mod = int(self.length) % len(LoremIpsum.lorem_impsum)
+        return div * LoremIpsum.lorem_impsum + LoremIpsum.lorem_impsum[:mod]
 #------------------------------------------------------------------------------
 class Name(AbstractDataSet):
     '''
@@ -110,28 +116,28 @@ class Name(AbstractDataSet):
     '''
     
     ''' Popular first names in 2010 '''
-    fname = ['Ava', 'Aaron', 'Agathe', 'Agnes', 'Alba', 'Alexander', 'Alexis', \
-    'Alvaro', 'Andrew', 'Andrei', 'Angelina', 'Anthony', 'Anna', 'Ariana', \
-    'Brian', 'Bogdan', 'Carmen', 'Cristopher', 'Connor', 'Daan', \
-    'Daniel', 'David', 'Diego', 'Ella', 'Elizabeth', 'Elsa', \
-    'Emma', 'Enzo', 'Ethan', 'Gabriel', 'Grace', 'Gustav', \
-    'Isaac', 'Jacob', 'Javier', 'Jayden', 'John', 'Juliette', \
-    'Kacper', 'Lars', 'Leah', 'Levi', 'Logan', 'Lotte', 'Lucas', \
-    'Lieke', 'Linus', 'Lucia', 'Mateusz', 'Maxime', 'Melvin', \
-    'Mia', 'Michael', 'Mikolaj', 'Milan', 'Natalie', 'Natalia', \
-    'Olivia', 'Oscar', 'Pablo', 'Paul', 'Paula', 'Piotr', 'Quentin', \
-    'Sarah', 'Samuel', 'Sophia', 'Sem', 'Szymon', 'Thijs', 'Teodore', \
+    fname = ['Ava', 'Aaron', 'Agathe', 'Agnes', 'Alba', 'Alexander', 'Alexis',
+    'Alvaro', 'Andrew', 'Andrei', 'Angelina', 'Anthony', 'Anna', 'Ariana',
+    'Brian', 'Bogdan', 'Carmen', 'Cristopher', 'Connor', 'Daan',
+    'Daniel', 'David', 'Diego', 'Ella', 'Elizabeth', 'Elsa',
+    'Emma', 'Enzo', 'Ethan', 'Gabriel', 'Grace', 'Gustav',
+    'Isaac', 'Jacob', 'Javier', 'Jayden', 'John', 'Juliette',
+    'Kacper', 'Lars', 'Leah', 'Levi', 'Logan', 'Lotte', 'Lucas',
+    'Lieke', 'Linus', 'Lucia', 'Mateusz', 'Maxime', 'Melvin',
+    'Mia', 'Michael', 'Mikolaj', 'Milan', 'Natalie', 'Natalia',
+    'Olivia', 'Oscar', 'Pablo', 'Paul', 'Paula', 'Piotr', 'Quentin',
+    'Sarah', 'Samuel', 'Sophia', 'Sem', 'Szymon', 'Thijs', 'Teodore',
     'Valeria', 'Valter', 'William', 'Wilma' ]
     
     ''' Last names '''
-    lname = ['Abbott', 'Alcott', 'Antonescu', 'Bartok', 'Bayard', 'Banciu', \
-    'Bethmann', 'Bergen', 'Botev', 'Brown', 'Bush', 'Corvinus', \
-    'Chehachkov', 'Dimitrof', 'Dinev', 'Delano', 'Eisenhower',  'Enescu', \
-    'Frels', 'Fugger', 'Gilman', 'Hancock', 'Hoza', 'Ionescu', 'Iordache', \
-    'Kalish', 'Kafka', 'Krasniki', 'Lukasewicz', 'McCormick', 'Medici', \
-    'Menier', 'Morgan', 'Palagyi', 'Parrocel', 'Romanov', 'Rozycki', \
-    'Rufus', 'Olaru', 'Otis', 'Schoenberger', 'Strauss', 'Somoza', \
-    'Sowinski', 'Szigete', 'Tessedik', 'Tisch', 'Vajda', 'Vlas', \
+    lname = ['Abbott', 'Alcott', 'Antonescu', 'Bartok', 'Bayard', 'Banciu',
+    'Bethmann', 'Bergen', 'Botev', 'Brown', 'Bush', 'Corvinus',
+    'Chehachkov', 'Dimitrof', 'Dinev', 'Delano', 'Eisenhower',  'Enescu',
+    'Frels', 'Fugger', 'Gilman', 'Hancock', 'Hoza', 'Ionescu', 'Iordache',
+    'Kalish', 'Kafka', 'Krasniki', 'Lukasewicz', 'McCormick', 'Medici',
+    'Menier', 'Morgan', 'Palagyi', 'Parrocel', 'Romanov', 'Rozycki',
+    'Rufus', 'Olaru', 'Otis', 'Schoenberger', 'Strauss', 'Somoza',
+    'Sowinski', 'Szigete', 'Tessedik', 'Tisch', 'Vajda', 'Vlas',
     'Walker', 'Warhola', 'Varchol', 'Wojnar', 'Zelenjcik']
             
     def next_value(self):
@@ -274,21 +280,23 @@ class DataSetEvaluator(object):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    ap = argparse.ArgumentParser(description='Generate test data.')
-    ap.add_argument('-i','--input', dest='ifile', help='the input file (XML)')
-    ap.add_argument('-o','--output', dest='ofile',
-                     help='the output file (TEXT)')
-    
-    results = ap.parse_args()
-    if results.ifile is None:
-        ap.error('Input file (IFILE) cannot be empty')
-        sys.exit(-1)
-    
-    dsv = DataSetEvaluator(results.ifile)
-    
-    if results.ofile is None:
-        dsv.write_output()
-    else:
-        out = open(results.ofile, mode='w')
-        dsv.write_output(output=out)
-        out.close()
+#    ap = argparse.ArgumentParser(description='Generate test data.')
+#    ap.add_argument('-i','--input', dest='ifile', help='the input file (XML)')
+#    ap.add_argument('-o','--output', dest='ofile',
+#                     help='the output file (TEXT)')
+#    
+#    results = ap.parse_args()
+#    if results.ifile is None:
+#        ap.error('Input file (IFILE) cannot be empty')
+#        sys.exit(-1)
+#    
+#    dsv = DataSetEvaluator(results.ifile)
+#    
+#    if results.ofile is None:
+#        dsv.write_output()
+#    else:
+#        out = open(results.ofile, mode='w')
+#        dsv.write_output(output=out)
+#        out.close()
+    t = LoremIpsum({'length' : '5'})
+    print(t.next_value())
