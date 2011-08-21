@@ -280,23 +280,21 @@ class DataSetEvaluator(object):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-#    ap = argparse.ArgumentParser(description='Generate test data.')
-#    ap.add_argument('-i','--input', dest='ifile', help='the input file (XML)')
-#    ap.add_argument('-o','--output', dest='ofile',
-#                     help='the output file (TEXT)')
-#    
-#    results = ap.parse_args()
-#    if results.ifile is None:
-#        ap.error('Input file (IFILE) cannot be empty')
-#        sys.exit(-1)
-#    
-#    dsv = DataSetEvaluator(results.ifile)
-#    
-#    if results.ofile is None:
-#        dsv.write_output()
-#    else:
-#        out = open(results.ofile, mode='w')
-#        dsv.write_output(output=out)
-#        out.close()
-    t = LoremIpsum({'length' : '5'})
-    print(t.next_value())
+    ap = argparse.ArgumentParser(description='Generate test data.')
+    ap.add_argument('-i','--input', dest='ifile', help='the input file (XML)')
+    ap.add_argument('-o','--output', dest='ofile',
+                     help='the output file (TEXT)')
+    
+    results = ap.parse_args()
+    if results.ifile is None:
+        ap.error('Input file (IFILE) cannot be empty')
+        sys.exit(-1)
+    
+    dsv = DataSetEvaluator(results.ifile)
+    
+    if results.ofile is None:
+        dsv.write_output()
+    else:
+        out = open(results.ofile, mode='w')
+        dsv.write_output(output=out)
+        out.close()
