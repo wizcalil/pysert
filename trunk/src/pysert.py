@@ -1,7 +1,8 @@
 '''
-@author: nomemory (Andrei Ciobanu)
+@author: nomemory
 @version: 0.1
 '''
+from abc import abstractclassmethod
 
 '''
 @license: 
@@ -41,6 +42,23 @@ class AbstractDataSet(object):
     
     __metaclass__ = abc.ABCMeta
     
+    @abstractclassmethod
+    def validation_list(self):
+        return [];
+    
+    def validate(self):
+        valid = True
+        vl_list = self.validation_list();
+        
+        for elem in vl_list:
+            if elem not in self.__dict__.keys():
+                sys.stderr.write('Error: Invalid data set : \'%s\' .\n' %
+                                 self.name)
+                sys.stderr.write('Error: Missing property \'%s\' .\n' %
+                                 elem)
+                sys.stderr.write('Exiting (-1).\n')
+                sys.exit(-1)
+        
     def __init__(self, ds_dict):
         '''
         Subclasses will have a dynamic structure based on the 
@@ -48,20 +66,26 @@ class AbstractDataSet(object):
         '''
         for (k, v) in ds_dict.items():
             self.__dict__[k] = v
+        #validate data set based on validation_list 
+        self.validate()
     
     @abc.abstractmethod
     def next_value(self):
         return
 #------------------------------------------------------------------------------
-class Number(AbstractDataSet):
+class RandomNumber(AbstractDataSet):
     '''
     ds_dict will contain the following:
             { 
+                "name" : <string value>
                 "floating" : "<boolean value>" ,
                 "min": "<integer value>",
                 "max": "<integer value>"
             }
     '''
+    def validation_list(self):
+        return ['name', 'floating', 'min', 'max']
+    
     def next_value(self):
         '''
         Returns a random value based on in the ds_dict properties .
@@ -70,7 +94,7 @@ class Number(AbstractDataSet):
         return func(int(self.min), int(self.max))
 #------------------------------------------------------------------------------
 class LoremIpsum(AbstractDataSet):
-    
+
     lorem_impsum = textwrap.dedent('''
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut quis justo leo. 
     Quisque congue elit eu ante euismod ut aliquam nisi bibendum. Donec mollis 
@@ -95,9 +119,13 @@ class LoremIpsum(AbstractDataSet):
     '''
     ds_dict will contain the following :
     {
+        "name" : <string value>
         "length" : "<integer value>"
     }
-    ''' 
+    '''
+    def validation_list(self):
+        return ['name', 'length']
+    
     def next_value(self):
         '''
         Returns a lorem ipsum text .
@@ -106,10 +134,12 @@ class LoremIpsum(AbstractDataSet):
         mod = int(self.length) % len(LoremIpsum.lorem_impsum)
         return div * LoremIpsum.lorem_impsum + LoremIpsum.lorem_impsum[:mod]
 #------------------------------------------------------------------------------
-class Name(AbstractDataSet):
+#------------------------------------------------------------------------------
+class PersonalName(AbstractDataSet):
     '''
     ds_dict will contain the following :
         {
+            "name" : <string value>
             "firstname" : "<boolean value>",
             "lastname" : "<boolean value>"
         }
@@ -139,7 +169,10 @@ class Name(AbstractDataSet):
     'Rufus', 'Olaru', 'Otis', 'Schoenberger', 'Strauss', 'Somoza',
     'Sowinski', 'Szigete', 'Tessedik', 'Tisch', 'Vajda', 'Vlas',
     'Walker', 'Warhola', 'Varchol', 'Wojnar', 'Zelenjcik']
-            
+    
+    def validation_list(self):
+        return ['name', 'firstname', 'lastname']
+    
     def next_value(self):
         '''
         Returns a random string based on ds_dict properties 
@@ -159,6 +192,7 @@ class Sequence(AbstractDataSet):
     '''
      ds_dict will contain the following:
         {
+            "name" : <string value>
             "start" : "<integer value>",
             "increment" : "<integer value>"
         }
@@ -170,6 +204,9 @@ class Sequence(AbstractDataSet):
         '''
         super(Sequence, self).__init__(ds_dict)
         self.__cval = int(self.start) - int(self.increment)
+    
+    def validation_list(self):
+        return ['name', 'start', 'increment']
         
     def next_value(self):
         '''
@@ -195,16 +232,16 @@ class DataSetBuilder(object):
         }
         '''
         #@PydevCodeAnalysisIgnore
-        self.__classes = { c.__name__ : c for c in \
+        self.classes = { c.__name__ : c for c in \
                         AbstractDataSet.__subclasses__()}
         
-    def instantiate(self, name, ds_dict):
+    def new(self, name, ds_dict):
         ''' 
         Returns the instance of the class based on class name .
         Every object instantiated with this method will be instances
         of AbstractDataSet subclasses .
         '''
-        return self.__classes[name](ds_dict)
+        return self.classes[name](ds_dict)
 #------------------------------------------------------------------------------
 class DataSetEvaluator(object):
     def __init__(self, xml_filename):
@@ -220,21 +257,38 @@ class DataSetEvaluator(object):
     
     def init_instances(self):
         '''
-        Parse __elem_tree to determine and instantiate the data
+        Parse __elem_tree to determine and new the data
         set objects present in the XML file . 
         '''
         #Obtain all the <dataset> elements from the XML file
         instances = {}
         dsb = DataSetBuilder()
         dataset_list = list(self.__elem_tree.iter("dataset"))
+        if len(dataset_list) == 0:
+            sys.stderr.write('Warning: Data sets not defined.\n')
         for dataset in dataset_list:
-            dataset_name = dataset.attrib['name']
-            dataset_type = dataset.attrib['type']
+            if 'name' in dataset.attrib.keys():
+                dataset_name = dataset.attrib['name']
+            else:
+                sys.stderr.write('Error: Unnamed data set. Aborting .\n')
+                sys.stderr.write('Exiting (-1)')
+                sys.exit(-1)
+            if 'type' in dataset.attrib.keys():
+                dataset_type = dataset.attrib['type']
+            else:
+                sys.stderr.write('Error: Untyped data set. Aborting. \n')
+                sys.stderr.write('Exiting (-1)')
+                sys.exit(-1)
             # Create the ds_dict for the Abstract Data Set subclasses
-            ds_dict = {key:value for (key,value) in dataset.attrib.items() if \
-                        key != 'name' and key != 'type'}
+            ds_dict = {key:value for (key,value) in dataset.attrib.items() if
+                       key != 'type'}
             #Build instances of Data Sets  
-            instances[dataset_name] = dsb.instantiate(dataset_type, ds_dict)
+            if dataset_type not in dsb.classes:
+                sys.stderr.write('Error: Unknown type: \'%s\'. Aborting. \n' %
+                                 dataset_type)
+                sys.stderr.write('Exiting (-1) .\n')
+                sys.exit(-1)
+            instances[dataset_name] = dsb.new(dataset_type, ds_dict)
         return instances
     
     def init_iterations(self):

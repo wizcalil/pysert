@@ -1,10 +1,10 @@
 <pysert iterations="20">
 	<!--  Declarative area -->
 	<dataset name="id" type="Sequence" start="300" increment="1"/>
-	<dataset name="fname" type="Name" firstname="True" lastname="False"/>
-	<dataset name="lname" type="Name" firstname="False" lastname="True"/>
-	<dataset name="jobid" type="Number" floating="False" min="100" max="200"/>
-	<dataset name="salary" type="Number" floating="False" min="1000" max="15000"/>
+	<dataset name="fname" type="PersonalName" firstname="True" lastname="False"/>
+	<dataset name="lname" type="PersonalName" firstname="False" lastname="True"/>
+	<dataset name="jobid" type="RandomNumber" floating="False" min="100" max="200"/>
+	<dataset name="salary" type="RandomNumber" floating="False" min="1000" max="15000"/>
 	<!--  Actual template to be converted -->
 	<template>
 INSERT INTO EMPLOYEES
